@@ -1,0 +1,63 @@
+name: Build and Release Multi-JDK JARs
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'   # 只有打 tag 时才触发
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        jdk: [8, 9, 17]
+    name: Build with JDK ${{ matrix.jdk }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK ${{ matrix.jdk }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ matrix.jdk }}
+
+      - name: Compile Java
+        run: javac HCMendetool.java
+
+      - name: Package JAR
+        run: |
+          jar cef HCMendetool HCMendetool_jdk${{ matrix.jdk }}.jar HCMendetool.class
+
+      - name: Upload JAR Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: HCMendetool_jdk${{ matrix.jdk }}.jar
+          path: HCMendetool_jdk${{ matrix.jdk }}.jar
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Get Release Info
+        id: get_release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload JARs to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: |
+            artifacts/**/HCMendetool_jdk*.jar
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
