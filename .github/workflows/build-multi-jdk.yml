@@ -5,7 +5,9 @@ on:
   push:
     tags:
       - 'v*'   # 只有打 tag 时才触发
-
+permissions:
+  contents: write
+  
 jobs:
   build:
     runs-on: ubuntu-latest
