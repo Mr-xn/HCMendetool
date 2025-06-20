@@ -191,9 +191,7 @@ public class HCMendetool {
     public static void main(String[] args) {
         String fileName = getCurrentFileName();
         if (args.length < 2) {
-            System.out.println("宏景HCM任意文件读取路径加密/解密工具\ngitub: https://github.com/Mr-xn/HCMendetool");
-            System.out.println("请提供正确的参数！");
-            System.out.println("用法: java -jar " + fileName + " -e/-d [文件路径/加密字符串] [秘钥(可选)]");
+            System.out.println("用法: java -jar " + fileName + " -e[ec|eec]/-d[dc] [文件路径/加密字符串] [秘钥(可选)]");
             return;
         }
 
@@ -207,15 +205,23 @@ public class HCMendetool {
 
         if ("-e".equals(option)) {
             String encryptedData = encrypt2(data, key);
-            String encodeDate = encode(encryptedData);
-            System.out.println("加密结果:\n" + encryptedData + "\n编码结果: \n" + encodeDate);
-        } else if ("-d".equals(option)) {
+            System.out.println(encryptedData);
+        } else if ("-ec".equals(option)) {
+            String encodeData = encode(data);
+            System.out.println(encodeData);
+        }else if ("-eec".equals(option)) {
+            String encodeencryptDate = encode(encrypt2(data, key));
+            System.out.println(encodeencryptDate);
+        }else if ("-d".equals(option)) {
             String decryptedData = decrypt2(decode(data), key);
-            System.out.println("解密结果:\n" + decryptedData);
+            System.out.println(decryptedData);
+        }else if ("-dc".equals(option)) {
+            String decodedData = decode(data);
+            System.out.println(decodedData);
         } else {
             System.out.println("宏景HCM任意文件读取路径加密/解密工具\ngitub: https://github.com/Mr-xn/HCMendetool");
             System.out.println("请提供正确的参数！");
-            System.out.println("用法: java -jar " + fileName + " -e/-d [文件路径/加密字符串] [秘钥(可选)]");
+            System.out.println("用法: java -jar " + fileName + " -e[ec|eec]/-d[dc] [文件路径/加密字符串] [秘钥(可选)]");
         }
     }
 
